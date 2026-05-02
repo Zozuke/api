@@ -1,15 +1,38 @@
 export default async function handler(req, res) {
-  const { inicio, fin } = req.query;
+  try {
+    const { inicio, fin } = req.query;
 
-  const respuesta = await fetch(
-    `https://api.openrouteservice.org/v2/directions/driving-car?start=${inicio}&end=${fin}`,
-    {
-      headers: {
-        Authorization: "TU_API_KEY"
-      }
+    if (!inicio || !fin) {
+      return res.status(400).json({
+        error: "Faltan parámetros: inicio y fin"
+      });
     }
-  );
 
-  const datos = await respuesta.json();
-  res.status(200).json(datos);
+    const response = await fetch(
+      "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: process.env.ORS_API_KEY
+        },
+        body: JSON.stringify({
+          coordinates: [
+            inicio.split(",").map(Number),
+            fin.split(",").map(Number)
+          ]
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    return res.status(200).json(data);
+
+  } catch (error) {
+    return res.status(500).json({
+      error: "Error en el servidor",
+      detalle: error.message
+    });
+  }
 }
