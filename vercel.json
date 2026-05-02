@@ -1,8 +1,15 @@
 {
   "version": 2,
-  "functions": {
-    "api/ruta.js": {
-      "runtime": "nodejs20.x"
+  "builds": [
+    {
+      "src": "api/ruta.js",
+      "use": "@vercel/node"
     }
-  }
+  ],
+  "routes": [
+    {
+      "src": "/api/ruta",
+      "dest": "/api/ruta.js"
+    }
+  ]
 }
